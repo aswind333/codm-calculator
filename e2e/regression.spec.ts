@@ -3,7 +3,7 @@ const button = (page: Page, name: string) => page.getByRole('button', { name, ex
 const row = (page: Page, name: string) => page.getByRole('row', { name: new RegExp(`^${name} `) })
 const cost = (page: Page, name: string) => page.getByText(name, { exact: true }).locator('..').locator('dd')
 const price = (page: Page) => page.locator('.price-table-wrap').getByLabel('传说武器转盘 第1抽', { exact: true })
-test.beforeEach(async ({ page }) => { await page.goto('/') })
+test.beforeEach(async ({ page }) => { await page.goto('./') })
 test('A B E: 数学案例、规则导航与状态隔离', async ({ page }) => {
   await button(page, '六等奖').click(); await button(page, '七等奖').click()
   await expect(page.getByText('第3抽 / 共10抽')).toBeVisible()
@@ -84,4 +84,26 @@ test('静态资源本地加载、离线会话可用及大数值不溢出', async
   await context.setOffline(true); await button(page, '六等奖').click(); await expect(page.getByText('第2抽 / 共10抽')).toBeVisible()
   await button(page, '规则说明').click(); await button(page, '七抽转盘').click(); await expect(page.getByText('3.125%', { exact: true })).toBeVisible()
   expect(external).toEqual([])
+})
+
+test('Pages 子路径资源、刷新及取消草稿', async ({ page, request }) => {
+  const failed: string[] = []
+  page.on('response', response => { if (response.status() >= 400) failed.push(response.url()) })
+  await page.reload()
+  await expect(page).toHaveURL(/\/codm-calculator\/$/)
+  const urls = await page.locator('script[src], link[rel=stylesheet]').evaluateAll(nodes => nodes.map(n => n.getAttribute('src') ?? n.getAttribute('href')!))
+  expect(urls.length).toBeGreaterThan(0)
+  for (const url of urls) {
+    expect(url).toMatch(/^\/codm-calculator\/assets\//)
+    expect((await request.get(url)).status()).toBe(200)
+  }
+  for (const file of ['favicon.svg', 'icons.svg']) expect((await request.get(`./${file}`)).status()).toBe(200)
+  await button(page, '设置').click(); await price(page).fill('30'); await button(page, '保存设置').click()
+  await price(page).fill('40'); page.once('dialog', d => d.accept()); await button(page, '取消修改').click()
+  await expect(price(page)).toHaveValue('30')
+  await button(page, '返回概率计算').click(); await expect(cost(page, '下一抽需要')).toHaveText('30 使命卡片')
+  await button(page, '规则说明').click(); await page.reload()
+  await expect(page.getByRole('heading', { name: '下一抽，心里有数。' })).toBeVisible()
+  await expect(cost(page, '下一抽需要')).toHaveText('30 使命卡片')
+  expect(failed).toEqual([])
 })

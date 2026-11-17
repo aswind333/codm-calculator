@@ -265,3 +265,31 @@ package-lock.json 为 lockfileVersion 3，根依赖声明与 package.json 一致
 人工验收：npm run dev -- --host 127.0.0.1，打开实际Local地址；在375/430/768/1280/1440px完成A～G流程，尤其手机输入时保存按钮、软键盘遮挡、安全区域和旋转屏幕；用Tab/方向键/Enter/空格检查控件，打开系统减少动态效果。npm run test:e2e复现；npx playwright show-report查看结果，test-results查看截图。
 
 未验证：真实iPhone/Android、实际macOS Chrome/Safari应用、真实软键盘和屏幕阅读器。Playwright WebKit不是Safari应用，模拟宽度不等同真实手机。本阶段无已知自动化阻塞；上述人工项及用户验收为后续S7前依赖。未执行S7或部署，停止等待审核。
+
+## 2026-11-17 — S7：GitHub Pages 本地部署准备
+
+状态：PASS（仅本地配置与发布前检查，不代表线上部署完成）。用户明确将Cloudflare Pages改为GitHub Pages，且首次提交/推送/发布由用户手动执行；旧文档平台表述不回写。读取AGENTS、S7计划、PRD/UI/数学相关约束及入口、配置、资源、Git现状。
+
+开始状态：main跟踪origin/main，工作区干净；origin=https://github.com/aswind333/codm-calculator.git；本地历史为6c1eacb Initial commit，无既有.github工作流。未访问或修改用户仓库设置，未commit/push/触发部署。
+
+文件：
+- vite.config.ts：base='/codm-calculator/'，其余插件不变。
+- playwright.config.ts：生产预览baseURL和就绪探针使用子路径。
+- e2e/regression.spec.ts：入口由绝对/改为相对./；新增子路径JS/CSS返回200、public文件可达、取消草稿不影响已保存值、规则页刷新仍能加载及持久化验证。
+- 新建.github/workflows/deploy.yml：main push/workflow_dispatch（仅main可发布）；ubuntu-latest；checkout@v7、setup-node@v7（Node24+锁文件npm缓存）、npm ci、144项单元/组件测试、lint、typecheck、build、安装三浏览器及运行E2E。通过后configure-pages@v6、upload-pages-artifact@v5上传dist；独立deploy任务deploy-pages@v5，github-pages环境及page_url。构建contents:read/pages:read，部署pages:write/id-token:write，关闭checkout凭据持久化。无PAT、第三方机器人、站点自动enablement。
+- README.md：补充GitHub Pages目标、网址、子路径开发预览、工作流、首次发布和线上验收边界；保留历史内容。
+- docs/DEV_LOG.md：本记录。没有更改UI/数学/默认数据/保存存储逻辑或增加依赖。
+
+Action版本依据官方各仓库releases/latest核对：checkout7.0.1/setup-node7.1.0/configure-pages6.0.0/upload-pages-artifact5.0.0/deploy-pages5.0.1，工作流使用对应主版本标签。采用https://vite.dev/guide/static-deploy和GitHub官方Pages工作流结构。部分README示例仍用旧主版本，选用release已发布版本。
+
+执行：npm ci成功；npm run test 8文件144例PASS；npm run lint/typecheck/build PASS；npm run test:e2e 30/30 PASS（Chromium/WebKit/Firefox各10，14.1秒），全部访问本地生产/codm-calculator/。YAML本地解析成功（build/deploy两个任务）；git diff --check通过，未实际运行GitHub工作流。本地Node25.9.0；CI配置Node24满足Vite/jsdom/Playwright引擎范围，Ubuntu/Node24实际执行待首次推送。
+
+构建index.html引用/codm-calculator/assets/index-BZk3-6NB.js及/codm-calculator/assets/index-DsOoGoxp.css；没有根/assets/。JS/CSS及favicon.svg/icons.svg子路径HTTP200，浏览器检查未见资源404。favicon/icons是public未引用模板文件，组件图标为内嵌SVG，无新图标引用。开发服务器5189启动成功，授权环境curl验证子路径HTML和src入口均200；首次沙箱curl无法连接，转为授权本地探测成功。自启dev服务器关闭，E2E托管preview自动关闭。
+
+导航为React状态，不写URL，没有/settings或/rules深链接，因此无需路由重写/404兜底。规则页刷新按既有逻辑回计算页，已保存设置保留。生产回归包含十抽1.497%/668.000及七抽3.125%、显式保存/刷新/取消/恢复、终局零权重及大数值、五视口无整页横向溢出。原验收UI保持不变。
+
+安全/静态检查：对全部Git跟踪文本做常见凭据模式扫描，无疑似密码/token/key/private-key命中（不等同专业安全审计）；无已跟踪.env、node_modules、dist或测试报告；git check-ignore确认均排除。源码无运行时远程CDN/API请求；data SVG不请求网络；无服务器端功能或Pages静态托管阻断。单一初始提交即当前跟踪内容，未改写Git历史。
+
+必须线上验证：GitHub托管runner/Action下载及Linux浏览器环境、仓库与github-pages环境授权、Pages artifact发布、HTTPS/CDN/公网访问和实际URL功能。localStorage按origin隔离，localhost数据不会迁移到github.io。真实手机与实际Safari人工检查沿用S6未验证说明。
+
+收尾：5个已跟踪文件修改，新增1个workflow，全部未暂存。无已知本地阻塞；首次发布由用户审查后手动git add指定文件、git commit、git push origin main，再于Actions → Deploy to GitHub Pages查看build/deploy，成功后访问https://aswind333.github.io/codm-calculator/。本任务停止，不发布。
