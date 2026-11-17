@@ -45,11 +45,15 @@ npm run test:e2e
 
 截图是辅助人工检查的产物，并非已有批准基准图的像素比较。桌面模拟视口不能替代真实手机键盘、安全区域及Safari浏览器手工测试。离线测试仅验证已加载页面的本地功能，不意味着支持离线刷新或PWA缓存。
 
-## GitHub Pages 部署（S7，本地准备）
+## GitHub Pages 部署
 
-部署平台已由原计划的 Cloudflare Pages 改为 **GitHub Pages**；旧需求文档中的平台名称保留为历史记录。预计网址：
+部署平台已由原计划的 Cloudflare Pages 改为 **GitHub Pages**；旧需求文档中的平台名称保留为历史记录。当前目标网站地址（仓库更名后）：
 
-https://aswind333.github.io/codm-calculator/
+https://aswind333.github.io/codmpayking/
+
+当前仓库：https://github.com/aswind333/codmpayking
+
+本地目录仍为 `~/codm-calculator`，无需改名。npm包名保留为 `codm-calculator`，它不决定GitHub Pages路径；旧开发日志中的名称与网址仅记录当时状态。
 
 推荐 Node.js 24（工作流使用24；本机也可使用满足依赖要求的版本）。
 
@@ -63,9 +67,9 @@ npm run build
 npm run preview
 ```
 
-开发及预览均访问终端显示的 `/codm-calculator/` 地址，例如预览默认 `http://localhost:4173/codm-calculator/`。Playwright预览地址为 `http://127.0.0.1:4179/codm-calculator/`。
+开发及预览均访问终端显示的 `/codmpayking/` 地址，例如预览默认 `http://localhost:4173/codmpayking/`。Playwright预览地址为 `http://127.0.0.1:4179/codmpayking/`。
 
-Vite `base` 固定为 `/codm-calculator/`，打包JS/CSS由Vite添加前缀。组件使用本地内嵌SVG；当前未引用public中的favicon/icons文件，它们仍可从子路径访问。今后引用public资源时使用 `import.meta.env.BASE_URL`（HTML可使用 `%BASE_URL%`），不要硬编码域名根目录的 `/assets/`。
+Vite `base` 固定为 `/codmpayking/`，打包JS/CSS由Vite添加前缀。组件使用本地内嵌SVG；当前未引用public中的favicon/icons文件，它们仍可从子路径访问。今后引用public资源时使用 `import.meta.env.BASE_URL`（HTML可使用 `%BASE_URL%`），不要硬编码域名根目录的 `/assets/`。
 
 三页通过React状态切换，不产生独立URL路径；刷新仓库根入口正常，按原有行为回到计算页并读取已保存设置。没有 `/settings` 或 `/rules` 深链接，不需要404回退脚本。localhost与线上域名的localStorage相互隔离，本地调试设置不会自动迁移到线上。
 

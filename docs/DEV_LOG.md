@@ -293,3 +293,17 @@ Action版本依据官方各仓库releases/latest核对：checkout7.0.1/setup-nod
 必须线上验证：GitHub托管runner/Action下载及Linux浏览器环境、仓库与github-pages环境授权、Pages artifact发布、HTTPS/CDN/公网访问和实际URL功能。localStorage按origin隔离，localhost数据不会迁移到github.io。真实手机与实际Safari人工检查沿用S6未验证说明。
 
 收尾：5个已跟踪文件修改，新增1个workflow，全部未暂存。无已知本地阻塞；首次发布由用户审查后手动git add指定文件、git commit、git push origin main，再于Actions → Deploy to GitHub Pages查看build/deploy，成功后访问https://aswind333.github.io/codm-calculator/。本任务停止，不发布。
+
+## 仓库更名适配 — codmpayking
+
+状态：PASS（本地迁移适配与回归，不代表新网址线上部署验证）。当前仓库：https://github.com/aswind333/codmpayking；目标网站：https://aswind333.github.io/codmpayking/。以上为现行地址，前述S7记录中的旧地址和构建路径仅保留历史含义。本地目录继续为~/codm-calculator，npm包名保持原值；不重命名目录或改写历史。
+
+开始时main与本地origin/main引用同步、工作区干净，远程已由用户更新为新仓库。读取AGENTS、Vite/Playwright/E2E/workflow/package/README及开发日志，搜索所有跟踪文件中的旧名称。
+
+修改5个文件，无新增文件：vite.config.ts将base设为/codmpayking/；playwright.config.ts更新预览baseURL及就绪地址；e2e/regression.spec.ts只替换网址与资源路径断言中的名称，所有测试和断言要求保留；README更新当前仓库、网站、开发和预览地址并解释保留本地目录/npm包名；本日志追加迁移记录。.github/workflows/deploy.yml没有硬编码旧仓库路径，无需修改，保留main触发及全部质量检查/官方Pages部署步骤。src、默认数据、数学、UI、草稿保存及存储逻辑均未改动。
+
+实际结果：npm run test 8文件144例PASS；npm run lint/typecheck/build全部PASS；npm run test:e2e 30/30 PASS（Chromium/WebKit/Firefox各10，14.2秒）；git diff --check PASS。生产预览/codmpayking/通过首页/设置/规则、七十抽案例、草稿隔离、保存刷新、取消修改、零权重/终局、五种视口及资源HTTP200检查。dist/index.html的JS/CSS引用/codmpayking/assets/；扫描dist全部文件无旧部署路径。favicon/icons子路径可达，组件SVG无需改动。开发服务器在新子路径的HTML和src入口均HTTP200，验证后关闭；生产预览由Playwright自动关闭。
+
+当前生产源码、部署配置及E2E无旧路径；旧名称仅保留于本地目录说明、npm元数据和历史文档。跟踪文本扫描已知个人姓名、账户标识、个人绝对路径、设备名及邮箱模式无命中；没有新增个人身份信息。
+
+收尾：main，5个已跟踪文件未暂存修改。未执行git add/commit/push/rebase、修改作者或历史、调整远程设置或触发部署。待用户审查后提交并推送，届时在新仓库Actions检查Deploy to GitHub Pages结果并对新公网地址复验。无已知本地阻塞，停止等待验收。

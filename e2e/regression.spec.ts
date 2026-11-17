@@ -90,11 +90,11 @@ test('Pages 子路径资源、刷新及取消草稿', async ({ page, request }) 
   const failed: string[] = []
   page.on('response', response => { if (response.status() >= 400) failed.push(response.url()) })
   await page.reload()
-  await expect(page).toHaveURL(/\/codm-calculator\/$/)
+  await expect(page).toHaveURL(/\/codmpayking\/$/)
   const urls = await page.locator('script[src], link[rel=stylesheet]').evaluateAll(nodes => nodes.map(n => n.getAttribute('src') ?? n.getAttribute('href')!))
   expect(urls.length).toBeGreaterThan(0)
   for (const url of urls) {
-    expect(url).toMatch(/^\/codm-calculator\/assets\//)
+    expect(url).toMatch(/^\/codmpayking\/assets\//)
     expect((await request.get(url)).status()).toBe(200)
   }
   for (const file of ['favicon.svg', 'icons.svg']) expect((await request.get(`./${file}`)).status()).toBe(200)
