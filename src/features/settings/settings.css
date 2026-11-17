@@ -1,0 +1,53 @@
+.settings-panel button, .intro button { min-height: 44px; padding: 8px 14px; border: 1px solid var(--border); border-radius: 9px; color: var(--primary); background: var(--surface); }
+.settings-panel button:disabled { color: var(--muted); background: var(--page); }
+.settings-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; position: sticky; top: 0; z-index: 3; background: var(--surface); padding: 12px 0; border-bottom: 1px solid var(--border); }
+.settings-actions strong { margin-right: auto; font-size: .9rem; }
+.settings-actions .save-button:not(:disabled) { background: var(--primary); color: var(--surface); }
+.settings-tabs { margin: 24px 0; width: fit-content; gap: 4px; }
+.settings-tabs [aria-selected=true] { background: var(--primary); color: var(--surface); }
+.setting-field { display: flex; flex-direction: column; gap: 5px; font-size: .75rem; text-align: left; }
+.setting-field input { width: 100%; min-width: 0; min-height: 44px; font: inherit; font-size: .9rem; color: var(--ink); background: var(--surface); border: 1px solid var(--border); border-radius: 7px; padding: 8px; }
+.setting-field input[aria-invalid=true] { border-color: var(--danger); }
+.field-error { color: var(--danger); font-size: .75rem; overflow-wrap: anywhere; }
+.price-table-wrap { overflow-x: auto; max-width: 100%; }
+.price-matrix { table-layout: fixed; min-width: 1040px; }
+.price-type-column { width: 158px; }
+.price-total-column { width: 76px; }
+.price-reset-column { width: 94px; }
+.price-matrix th, .price-matrix td { padding: 10px 4px; }
+.price-matrix th:first-child { position: sticky; left: 0; width: auto; background: var(--surface); z-index: 1; }
+.price-matrix td { vertical-align: top; }
+.price-matrix th { white-space: normal; }
+.price-matrix td:last-child button { width: 100%; padding: 8px 4px; font-size: .75rem; }
+.price-matrix caption { text-align: left; padding-bottom: 12px; }
+.price-matrix .setting-field { font-size: .7rem; gap: 4px; }
+.price-matrix .setting-field input { padding: 6px; font-size: .85rem; }
+.probability-grid { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: 12px; margin: 20px 0; }
+.probability-card { padding: 16px; border: 1px solid var(--border); border-radius: 12px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.probability-total { margin: 16px 0; color: var(--primary); font-weight: 700; }
+.mobile-price { display: none; }
+.round-inputs { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; margin: 16px 0; }
+.settings-panel select { margin: 8px; }
+@media (max-width: 767px) {
+  .mobile-price { display: block; }
+  .price-table-wrap { display: none; }
+  .price-table-wrap.show-table { display: block; margin-top: 20px; }
+  .probability-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .settings-actions { top: 0; padding: 10px 0; }
+  .settings-actions strong { width: 100%; }
+  .settings-panel select { max-width: 100%; margin: 8px 0; }
+  .settings-panel { padding: 14px; }
+  .mobile-price > button { margin: 6px 6px 6px 0; }
+}
+
+/* Keep focused fields clear of the sticky actions, including mobile keyboards. */
+.setting-field input { scroll-margin-top: 150px; scroll-margin-bottom: 80px; }
+.settings-actions { top: env(safe-area-inset-top, 0px); }
+@media (min-width: 768px) and (max-width: 1023px) {
+  .probability-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 767px) {
+  .setting-field input, .price-matrix .setting-field input, .settings-panel select { font-size: 16px; }
+  .settings-actions { gap: 6px; }
+  .settings-actions button { padding: 8px 10px; }
+}

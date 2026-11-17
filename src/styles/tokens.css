@@ -1,0 +1,16 @@
+:root {
+  --page: #f4f5f8;
+  --surface: #ffffff;
+  --ink: #343447;
+  --muted: #6f6a7b;
+  --primary: #7650b5;
+  --primary-soft: #f2edfb;
+  --pink: #f8e3ef;
+  --blue: #edf5fc;
+  --border: #e5e0ed;
+  --danger: #a12c52;
+  --shadow: 0 5px 22px rgb(52 52 71 / 4%);
+  --rank-silver: #99547c;
+  --rank-bronze: #41708e;
+  --radius: 16px;
+}
