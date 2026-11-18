@@ -1,7 +1,7 @@
 .rules-page { max-width: 900px; margin: auto; overflow-wrap: anywhere; }
-.rules-page > .panel { margin-bottom: 20px; }
+.rules-page > .panel { margin-bottom: 12px; }
 .rules-page h3 { font-size: 1rem; margin: 0; }
-.rules-page .panel > p { margin-top: 14px; }
+.rules-page .rule-content > p { margin-top: 14px; }
 .rules-steps, .rules-flow { display: grid; list-style: none; padding: 0; gap: 12px; margin: 18px 0; }
 .rules-steps { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .rules-steps li, .rules-flow li { border: 1px solid var(--border); border-radius: 12px; padding: 14px; min-width: 0; }
@@ -18,8 +18,23 @@
 .rules-faq button { width: 100%; display: flex; justify-content: space-between; gap: 12px; text-align: left; padding: 16px 0; border: 0; color: var(--ink); background: transparent; }
 .rules-faq button span { color: var(--primary); }
 .rules-faq p { padding-bottom: 16px; color: var(--muted); }
-.rules-disclaimer { font-size: .85rem; color: var(--muted); margin: 24px 0; }
 @media (max-width: 600px) { .rules-steps, .rules-flow { grid-template-columns: 1fr; } .rules-page .panel { padding: 18px; } }
 .rules-faq > [role=region] { opacity: 1; transition: opacity .18s, display .18s allow-discrete; }
 .rules-faq > [role=region][hidden] { opacity: 0; }
 @starting-style { .rules-faq > [role=region]:not([hidden]) { opacity: 0; } }
+
+.rules-page { padding-top: 20px; }
+@media (max-width: 560px) { .rules-page { padding-top: 14px; } }
+.rules-page .rule-section { padding: 0; }
+.rule-trigger { width: 100%; min-height: 56px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 24px; border: 0; border-radius: var(--radius); background: transparent; color: var(--ink); text-align: left; font: inherit; font-size: 1rem; }
+.rule-arrow { flex-shrink: 0; color: var(--primary); transition: transform .18s; }
+.rule-trigger[aria-expanded=true] .rule-arrow { transform: rotate(180deg); }
+.rule-collapse { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows .18s ease, opacity .18s ease; }
+.rule-collapse[data-open=true] { grid-template-rows: 1fr; opacity: 1; }
+.rule-clip { min-height: 0; overflow: hidden; }
+.rule-content { padding: 0 24px 20px; }
+@media (max-width: 600px) {
+  .rule-trigger { padding: 14px 18px; }
+  .rule-content { padding: 0 18px 18px; }
+}
+@media (prefers-reduced-motion: reduce) { .rule-collapse, .rule-arrow { transition: none; } }

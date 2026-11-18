@@ -1,9 +1,10 @@
-.settings-panel button, .intro button { min-height: 44px; padding: 8px 14px; border: 1px solid var(--border); border-radius: 9px; color: var(--primary); background: var(--surface); }
+.settings-panel button { min-height: 44px; padding: 8px 14px; border: 1px solid var(--border); border-radius: 9px; color: var(--primary); background: var(--surface); }
 .settings-panel button:disabled { color: var(--muted); background: var(--page); }
-.settings-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; position: sticky; top: 0; z-index: 3; background: var(--surface); padding: 12px 0; border-bottom: 1px solid var(--border); }
-.settings-actions strong { margin-right: auto; font-size: .9rem; }
+.settings-actions { display: flex; justify-content: space-between; gap: 12px; align-items: center; position: sticky; top: 0; z-index: 3; background: var(--surface); padding: 0 0 12px; margin-bottom: 16px; border-bottom: 1px solid var(--border); }
+.settings-buttons { display: flex; gap: 8px; }
+.settings-actions button { white-space: nowrap; }
 .settings-actions .save-button:not(:disabled) { background: var(--primary); color: var(--surface); }
-.settings-tabs { margin: 24px 0; width: fit-content; gap: 4px; }
+.settings-tabs { margin: 0; width: fit-content; gap: 4px; flex-shrink: 0; }
 .settings-tabs [aria-selected=true] { background: var(--primary); color: var(--surface); }
 .setting-field { display: flex; flex-direction: column; gap: 5px; font-size: .75rem; text-align: left; }
 .setting-field input { width: 100%; min-width: 0; min-height: 44px; font: inherit; font-size: .9rem; color: var(--ink); background: var(--surface); border: 1px solid var(--border); border-radius: 7px; padding: 8px; }
@@ -33,8 +34,10 @@
   .price-table-wrap { display: none; }
   .price-table-wrap.show-table { display: block; margin-top: 20px; }
   .probability-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
-  .settings-actions { top: 0; padding: 10px 0; }
-  .settings-actions strong { width: 100%; }
+  .settings-actions { flex-direction: column; align-items: stretch; }
+  .settings-tabs { width: 100%; }
+  .settings-tabs button { flex: 1; }
+  .settings-buttons { display: grid; grid-template-columns: 1fr 1fr 1.3fr; gap: 6px; }
   .settings-panel select { max-width: 100%; margin: 8px 0; }
   .settings-panel { padding: 14px; }
   .mobile-price > button { margin: 6px 6px 6px 0; }
@@ -49,5 +52,8 @@
 @media (max-width: 767px) {
   .setting-field input, .price-matrix .setting-field input, .settings-panel select { font-size: 16px; }
   .settings-actions { gap: 6px; }
-  .settings-actions button { padding: 8px 10px; }
+  .settings-actions button { padding: 8px 4px; font-size: .75rem; }
 }
+
+.settings-page { padding-top: 20px; }
+@media (max-width: 560px) { .settings-page { padding-top: 14px; } }

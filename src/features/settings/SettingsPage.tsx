@@ -75,8 +75,8 @@ function ProbabilityEditor({ draft, update }: EditorProps) {
     <button onClick={() => update(c.typeId, old => ({ ...old, prizes: old.prizes.map((p, i) => ({ ...p, weightPercent: String(createDefaultConfig(c.typeId).prizes[i].weightPercent) })) }))}>恢复当前类型默认概率</button>
   </section>
 }
-export function SettingsPage({ saved, onSave, onDirty, onLeave }: {
-  saved: readonly ReadonlyDrawConfig[]; onSave: (configs: DrawConfig[]) => WriteResult; onDirty: (dirty: boolean) => void; onLeave: () => void
+export function SettingsPage({ saved, onSave, onDirty }: {
+  saved: readonly ReadonlyDrawConfig[]; onSave: (configs: DrawConfig[]) => WriteResult; onDirty: (dirty: boolean) => void
 }) {
   const [draft, setDraft] = useState(() => toDraft(saved))
   const [tab, setTab] = useState<'prices' | 'probabilities'>('prices')
@@ -100,26 +100,28 @@ export function SettingsPage({ saved, onSave, onDirty, onLeave }: {
     if (result.ok) { setDraft(toDraft(parsed)); setFeedback('设置已保存') }
     else setFeedback(result.message)
   }
-  return <main id="settings-main">
-    <div className="intro"><h1>自定义转盘设置</h1><p className="muted">调整每轮抽奖价格与奖品概率。编辑或恢复默认后，请点击保存设置。</p><button onClick={onLeave}>返回概率计算</button></div>
+  return <main id="settings-main" className="settings-page" aria-label="设置">
     <section className="panel settings-panel">
-      <div className="settings-actions"><strong>{dirty ? '有未保存的修改' : '当前无未保存修改'}</strong><button className="save-button" disabled={!dirty || !validation.valid} onClick={save}>保存设置</button>
-        <button disabled={!dirty} onClick={() => { if (window.confirm('放弃所有未保存的修改？')) { setDraft(toDraft(saved)); setFailed(false); setFeedback('已取消修改') } }}>取消修改</button>
-        <button onClick={() => { if (window.confirm('恢复全部默认配置？此操作只修改草稿，仍需保存。')) { setDraft(toDraft(createDefaultConfigs())); setFailed(false); setFeedback('已恢复默认草稿，请保存后生效') } }}>恢复全部默认</button>
+      <div className="settings-actions">
+        <div role="tablist" aria-label="设置分类" className="mode-switch settings-tabs" onKeyDown={event => {
+          const keys = ['ArrowLeft', 'ArrowRight', 'Home', 'End']
+          if (!keys.includes(event.key)) return
+          event.preventDefault()
+          const next = event.key === 'Home' ? 'prices' : event.key === 'End' ? 'probabilities' : tab === 'prices' ? 'probabilities' : 'prices'
+          setTab(next)
+          document.getElementById(next === 'prices' ? 'price-tab' : 'probability-tab')?.focus()
+        }}>
+          <button role="tab" tabIndex={tab === 'prices' ? 0 : -1} id="price-tab" aria-selected={tab === 'prices'} aria-controls="price-panel" onClick={() => setTab('prices')}>抽奖价格</button>
+          <button role="tab" tabIndex={tab === 'probabilities' ? 0 : -1} id="probability-tab" aria-selected={tab === 'probabilities'} aria-controls="probability-panel" onClick={() => setTab('probabilities')}>初始概率</button>
+        </div>
+        <div className="settings-buttons">
+          <button className="save-button" disabled={!dirty || !validation.valid} onClick={save}>保存设置</button>
+          <button disabled={!dirty} onClick={() => { if (window.confirm('放弃所有未保存的修改？')) { setDraft(toDraft(saved)); setFailed(false); setFeedback('已取消修改') } }}>取消修改</button>
+          <button onClick={() => { if (window.confirm('恢复全部默认配置？此操作只修改草稿，仍需保存。')) { setDraft(toDraft(createDefaultConfigs())); setFailed(false); setFeedback('已恢复默认草稿，请保存后生效') } }}>恢复全部默认</button>
+        </div>
       </div>
       {feedback && <p role={failed ? 'alert' : 'status'} className={failed ? 'error-note' : 'info-note'}>{feedback}</p>}
       {!validation.valid && <div role="alert" className="error-note"><strong>无法保存，请修正以下配置：</strong><ul>{draft.flatMap(c => validateConfig(fromDraft([c])[0]).issues.map((issue, i) => <li key={`${c.typeId}-${i}`}>{c.label} · {fieldName(issue.path)}：{issue.message}</li>))}</ul></div>}
-      <div role="tablist" aria-label="设置分类" className="mode-switch settings-tabs" onKeyDown={event => {
-        const keys = ['ArrowLeft', 'ArrowRight', 'Home', 'End']
-        if (!keys.includes(event.key)) return
-        event.preventDefault()
-        const next = event.key === 'Home' ? 'prices' : event.key === 'End' ? 'probabilities' : tab === 'prices' ? 'probabilities' : 'prices'
-        setTab(next)
-        document.getElementById(next === 'prices' ? 'price-tab' : 'probability-tab')?.focus()
-      }}>
-        <button role="tab" tabIndex={tab === 'prices' ? 0 : -1} id="price-tab" aria-selected={tab === 'prices'} aria-controls="price-panel" onClick={() => setTab('prices')}>抽奖价格</button>
-        <button role="tab" tabIndex={tab === 'probabilities' ? 0 : -1} id="probability-tab" aria-selected={tab === 'probabilities'} aria-controls="probability-panel" onClick={() => setTab('probabilities')}>初始概率</button>
-      </div>
       <div role="tabpanel" id="price-panel" aria-labelledby="price-tab" hidden={tab !== 'prices'}><PriceEditor draft={draft} update={update} /></div>
       <div role="tabpanel" id="probability-panel" aria-labelledby="probability-tab" hidden={tab !== 'probabilities'}><ProbabilityEditor draft={draft} update={update} /></div>
     </section>

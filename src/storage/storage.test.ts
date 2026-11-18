@@ -59,3 +59,19 @@ describe('草稿输入边界', () => {
     expect(createDefaultConfigs()[0].roundCosts[0]).toBe(3)
   })
 })
+
+it('既有v1数组原样保留标记顺序，保存不排序、清空只影响当前类型', () => {
+  const store = memory(), configs = createDefaultConfigs()
+  const first = configs[0], other = configs[7]
+  const order = [4, 1, 7].map(i => first.prizes[i].prizeId)
+  store.setItem(DRAWN_KEY, JSON.stringify({ version: 1, records: { [first.typeId]: order, [other.typeId]: [other.prizes[0].prizeId] } }))
+  const loaded = loadDrawn(store, configs)
+  expect(loaded.warning).toBeUndefined()
+  expect(loaded.records[first.typeId]).toEqual(order)
+  const removed = order.filter(id => id !== first.prizes[1].prizeId)
+  expect(saveDrawn(store, { ...loaded.records, [first.typeId]: removed }, configs).ok).toBe(true)
+  expect(loadDrawn(store, configs).records[first.typeId]).toEqual(removed)
+  expect(saveDrawn(store, { ...loaded.records, [first.typeId]: [] }, configs).ok).toBe(true)
+  expect(loadDrawn(store, configs).records).toEqual({ [first.typeId]: [], [other.typeId]: [other.prizes[0].prizeId] })
+  expect(store.values.size).toBe(1)
+})

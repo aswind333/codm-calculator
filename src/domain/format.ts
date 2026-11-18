@@ -17,3 +17,9 @@ export function formatAmount(result: EquivalentCost, kind: 'cards' | 'equivalent
   if (!Number.isFinite(result.value) || result.value < 0 || (kind === 'cards' && !Number.isInteger(result.value))) return '无效数据'
   return (kind === 'cards' ? integer : fixedThree).format(result.value)
 }
+
+
+const fixedTwo = new Intl.NumberFormat('en-US', { useGrouping: false, minimumFractionDigits: 2, maximumFractionDigits: 2 })
+export function formatValueIndex(value: number | null): string {
+  return value !== null && Number.isFinite(value) && value > 0 ? `${fixedTwo.format(value)}×` : '—'
+}
