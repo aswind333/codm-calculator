@@ -1,6 +1,6 @@
 import { useLayoutEffect } from 'react'
 
-/** Keep CSS rotation in visual-viewport coordinates, without remounting the draw. */
+/** Size the acquisition dialog to the visible area, including browser toolbars. */
 export function useSimulationViewport(active: boolean) {
   useLayoutEffect(() => {
     if (!active) return

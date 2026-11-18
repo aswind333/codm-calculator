@@ -1,6 +1,7 @@
+import type { ReactNode } from 'react'
 import { useEffect, useRef, useState } from 'react'
 
-export function HoldToClaim({ disabled, onClaim }: { disabled: boolean; onClaim: () => void }) {
+export function HoldToClaim({ disabled, onClaim, result }: { disabled: boolean; onClaim: () => void; result?: ReactNode }) {
   const [progress, setProgress] = useState(0)
   const held = useRef(false)
   const frame = useRef(0)
@@ -31,5 +32,5 @@ export function HoldToClaim({ disabled, onClaim }: { disabled: boolean; onClaim:
     onKeyDown={e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); if (!e.repeat) begin() } }}
     onKeyUp={e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); cancel() } }}>
     <span aria-hidden="true" />
-  </button><p className="sim-hold-progress">按住领取 <strong>{Math.floor(progress * 100)}%</strong></p></>
+  </button><div className="sim-claim-feedback"><span className="sim-hold-progress">按住领取 <strong>{Math.floor(progress * 100)}%</strong></span>{result}</div></>
 }

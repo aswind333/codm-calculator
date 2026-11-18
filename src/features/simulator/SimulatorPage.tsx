@@ -45,6 +45,13 @@ export function SimulatorPage({ configs, storage, active, onBusy, onEvent }: { c
     if (modal && active) dialog.current?.showModal()
     else if (dialog.current?.open) dialog.current.close()
   }, [modal, active])
+  useEffect(() => {
+    if (typeof window.matchMedia !== 'function') return
+    const portrait = window.matchMedia('(hover: none) and (pointer: coarse) and (max-width: 600px) and (orientation: portrait)')
+    const dismiss = () => { if (portrait.matches) setModal(false) }
+    portrait.addEventListener('change', dismiss)
+    return () => portrait.removeEventListener('change', dismiss)
+  }, [])
   async function mutate(change: (s: Simulation) => Simulation): Promise<Simulation | null> {
     if (running.current) return null
     running.current = true; setProcessing(true); setError('')
@@ -86,6 +93,12 @@ export function SimulatorPage({ configs, storage, active, onBusy, onEvent }: { c
   }
   if (!active) return null
   return <main id="simulator-main" className="sim-page" aria-label="模拟抽奖">
+    <section className="sim-rotate panel" aria-label="横屏提示">
+      <svg viewBox="0 0 64 64" aria-hidden="true"><rect x="22" y="12" width="22" height="38" rx="4" /><path d="M12 33a22 22 0 0 1 34-18M46 7v8h-8M52 31a22 22 0 0 1-34 18M18 57v-8h8" /></svg>
+      <h2>请横屏体验模拟抽奖</h2><p>请开启系统与浏览器的自动旋转，再将手机横放。</p>
+      <p>PC端体验更佳</p>
+      <p>部分机型、浏览器可能存在适配问题</p>
+    </section>
     <div className="sim-experience">
     {invalid && <button onClick={async () => {
       if (!window.confirm('仅清除模拟余额和模拟奖池记录？此操作不可撤销，不影响计算器设置。')) return
@@ -125,10 +138,10 @@ export function SimulatorPage({ configs, storage, active, onBusy, onEvent }: { c
     {animating && finished && error && <button disabled={processing} onClick={() => { void finish() }}>重试保存展示状态</button>}
     {reason && !pending && <p className="error-note" role="alert">{reason}</p>}
     <dialog ref={dialog} className="sim-dialog" aria-labelledby="claim-title" onCancel={() => setModal(false)} onClose={() => setModal(false)}>
-      {modal && <><h2 id="claim-title">领取使命卡片</h2><p>余额 {state.balance} / 600 · 无实际货币价值</p><HoldToClaim disabled={processing || state.balance >= 600 || !!pending || invalid} onClaim={() => {
+      {modal && <><button className="sim-dialog-close" aria-label="关闭" title="关闭" disabled={processing} onClick={() => setModal(false)}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg></button><h2 id="claim-title">领取使命卡片</h2><p>余额 {state.balance} / 600 · 无实际货币价值</p><HoldToClaim result={<span role="status">{state.balance >= 600 ? '余额已满，暂时不能领取。' : reward || '本次获得 0 张使命卡片'}</span>} disabled={processing || state.balance >= 600 || !!pending || invalid} onClaim={() => {
         let gained = 0
         void mutate(s => { const next = claimCards(s, randomUnit()); gained = next.balance - s.balance; return next }).then(next => { if (next) setReward(`本次获得 ${gained} 张使命卡片`) })
-      }} /><p role="status">{state.balance >= 600 ? '余额已满，暂时不能领取。' : reward || '中途松手、移出按钮或切换窗口将取消。'}</p>{error && <p role="alert">{error}</p>}<button disabled={processing} onClick={() => setModal(false)}>关闭</button></>}
+      }} />{error && <p role="alert">{error}</p>}</>}
     </dialog>
     </div>
   </main>
