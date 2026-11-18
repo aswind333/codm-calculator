@@ -21,7 +21,7 @@ export function CalculatorPage({ configs, storage }: { configs: readonly Readonl
     const ids = drawnByType[typeId] ?? []
     updateRecords({ ...drawnByType, [typeId]: ids.includes(id) ? ids.filter(item => item !== id) : [...ids, id] })
   }
-  return <main id="main" className="calculator-page" aria-label="概率计算">
+  return <main id="main" className="calculator-page" aria-label="抽奖分析">
     {warning && <p role="alert" className="error-note">{warning}</p>}
     <CalculatorView typeSelector={<label className="summary-type-label">转盘类型<select value={typeId} onChange={event => {
       const selected = configs.find(item => item.typeId === event.target.value)

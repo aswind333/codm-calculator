@@ -11,6 +11,8 @@ test('长按不足1.5秒取消、连续长按仅领取一次、上限和键盘�
   await expect(page.getByLabel('使命卡片余额')).toHaveText('0 / 600')
   await page.getByRole('button', { name: '获取使命卡片' }).click()
   const hold = page.getByRole('button', { name: '连续长按1.5秒领取卡片' })
+  await expect(hold).toHaveText('')
+  await expect(page.locator('.sim-hold-progress')).toHaveText('按住领取 0%')
   await hold.hover(); await page.mouse.down(); await page.clock.runFor(1400); await page.mouse.up()
   await expect(page.getByLabel('使命卡片余额')).toHaveText('0 / 600')
   await hold.hover(); await page.mouse.down(); await page.clock.runFor(1600)
@@ -83,7 +85,7 @@ for (const width of [375, 430, 768, 1280, 1440]) test(`七抽空位、免费单�
   await expect(page.getByText('剩余权重为零或配置无效，请调整并保存设置或重置奖池')).toBeVisible()
   await expect(page.getByRole('button', { name: '抽奖，消耗0张使命卡片' })).toBeDisabled()
   await expect(page.getByLabel('使命卡片余额')).toHaveText('0 / 600')
-  await page.getByRole('button', { name: '概率计算', exact: true }).click(); await expect(page.getByRole('button', { name: '一等奖', exact: true })).toHaveAttribute('aria-pressed', 'false')
+  await page.getByRole('button', { name: '抽奖分析', exact: true }).click(); await expect(page.getByRole('button', { name: '一等奖', exact: true })).toHaveAttribute('aria-pressed', 'false')
 })
 
 test('完整七抽无重复、类型记录隔离、终局与重置', async ({ page }) => {
@@ -147,7 +149,7 @@ test('本轮概率跟随剩余奖池，动画不提前透露结果，精简文�
   const main = page.locator('#simulator-main')
   await expect(main.getByText('第3抽 / 共10抽', { exact: true })).toBeVisible()
   await expect(main).not.toContainText('VIRTUAL DRAW'); await expect(main).not.toContainText('你的搭档，正在路上')
-  await expect(page.getByRole('button', { name: '概率计算', exact: true }).locator('svg')).toHaveCount(1)
+  await expect(page.getByRole('button', { name: '抽奖分析', exact: true }).locator('svg')).toHaveCount(1)
   await expect(page.getByRole('button', { name: '规则说明', exact: true }).locator('svg')).toHaveCount(1)
   await expect(page.locator('.sim-character svg text')).toHaveText('?')
   await expect(page.locator('.sim-wallet')).toContainText('使命卡片')

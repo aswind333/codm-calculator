@@ -38,8 +38,9 @@
 .sim-dialog::backdrop { background: #202038aa; }
 .sim-dialog p { margin: 12px 0; }
 .sim-dialog .sim-hold { display: grid; place-items: center; width: 190px; height: 190px; border-radius: 50%; margin: 24px auto; padding: 7px; border: 0; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
-.sim-hold > span { display: flex; flex-direction: column; justify-content: center; width: 100%; height: 100%; border-radius: 50%; background: var(--primary-soft); }
-.sim-hold strong { font-size: 1.8rem; }
+.sim-hold > span { pointer-events: none; display: flex; flex-direction: column; justify-content: center; width: 100%; height: 100%; border-radius: 50%; background: var(--primary-soft); }
+.sim-dialog .sim-hold-progress { margin: 8px 0; color: var(--primary); user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+.sim-hold-progress strong { display: inline-block; min-width: 4ch; font-variant-numeric: tabular-nums; }
 @media (max-width: 600px) {
   .sim-stage { padding: 12px; border-radius: 18px; }
   .sim-arena { grid-template-columns: minmax(0, 1fr) minmax(0, .85fr) minmax(0, 1fr); grid-template-rows: repeat(2, minmax(94px, auto)) minmax(120px, auto) repeat(2, minmax(94px, auto)); }
@@ -88,3 +89,57 @@
 .sim-round { justify-self: end; }
 @media (min-width: 601px) and (max-width: 1000px) { .sim-summary { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 600px) { .sim-summary { grid-template-columns: minmax(0, 1fr); } }
+
+
+/* Keep one mounted arena; device capability prevents narrow desktop false positives. */
+.sim-rotate { display: none; }
+@media (hover: none) and (pointer: coarse) and (max-width: 600px) and (orientation: portrait) {
+  .sim-experience { display: none; }
+  .sim-experience .sim-dialog { display: none; }
+  .sim-rotate { display: grid; justify-items: center; gap: 12px; margin-top: 14px; padding: 32px 18px; text-align: center; }
+  .sim-rotate svg { width: 64px; height: 64px; fill: none; stroke: var(--primary); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+  .sim-rotate h2 { font-size: 1.1rem; }
+  .sim-rotate p { font-size: .85rem; color: var(--muted); }
+}
+@media (hover: none) and (pointer: coarse) and (orientation: landscape) and (max-height: 500px) and (max-width: 1000px) {
+  /* Only the active simulator may compact the shared shell. Other pages are unchanged. */
+  .app-shell:has(#simulator-main) { padding-inline: max(12px, env(safe-area-inset-left)) max(12px, env(safe-area-inset-right)); }
+  .app-shell:has(#simulator-main) .site-header { padding-block: 4px; gap: 8px; flex-wrap: nowrap; }
+  .app-shell:has(#simulator-main) .brand { gap: 6px; }
+  .app-shell:has(#simulator-main) .brand-symbol { width: 36px; height: 36px; font-size: 1.3rem; }
+  .app-shell:has(#simulator-main) .brand strong { font-size: .85rem; }
+  .app-shell:has(#simulator-main) .brand small { font-size: .65rem; }
+  .app-shell:has(#simulator-main) nav { width: 368px; gap: 4px; }
+  .app-shell:has(#simulator-main) nav button { height: 44px; padding: 4px; gap: 3px; font-size: .75rem; }
+  .app-shell:has(#simulator-main) .nav-icon, .app-shell:has(#simulator-main) .settings-gear { width: 20px; height: 20px; font-size: 20px; }
+  .sim-stage { margin-top: 6px; padding: 6px 12px; border-radius: 16px; }
+  .sim-toolbar { display: flex; flex-wrap: wrap; gap: 4px 8px; margin-bottom: 6px; }
+  .sim-toolbar-left { width: auto; gap: 6px; }
+  .sim-type { flex: initial; }
+  .sim-toolbar select { width: 200px; min-width: 0; padding: 4px 28px 4px 8px; font-size: 16px; }
+  .sim-toolbar .sim-reset { padding: 4px 8px; font-size: .75rem; }
+  .sim-wallet { padding: 0 6px; gap: 5px; flex-wrap: nowrap; font-size: .75rem; }
+  .sim-wallet > span:first-child { font-size: 20px; }
+  .sim-wallet button { padding: 4px; min-width: 44px; }
+  .sim-arena { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: repeat(2, minmax(34px, auto)) minmax(44px, auto) repeat(2, minmax(34px, auto)); gap: 3px 0; }
+  .sim-side { gap: 3px; }
+  .sim-prize { display: grid; min-height: 34px; padding: 2px 4px; border-radius: 8px; grid-template-columns: 22px minmax(0, 1fr) max-content; gap: 0 3px; line-height: 1.2; }
+  .sim-prize.sim-major { min-height: 44px; }
+  .sim-prize .prize-mark { grid-column: 1; grid-row: 1 / span 2; width: 22px; height: 22px; font-size: .7rem; }
+  .sim-prize .prize-mark svg { width: 19px; height: 19px; }
+  .sim-prize > strong { grid-column: 2; grid-row: 1; font-size: .7rem; }
+  .sim-prize > small { grid-column: 2; grid-row: 2; font-size: .6rem; }
+  .sim-prize > .sim-prize-detail { grid-column: 3; grid-row: 1 / span 2; width: auto; }
+  .sim-prize-detail, .sim-probability, .sim-obtained { font-size: .65rem; }
+  .sim-character { padding: 2px; }
+  .sim-character svg { max-height: clamp(100px, 38dvh, 160px); width: 70%; }
+  .sim-character strong { font-size: .8rem; }
+  .sim-controls { grid-template-columns: minmax(0, 1fr) 160px minmax(0, 1fr); gap: 8px; margin-top: 6px; }
+  .sim-controls .sim-round { grid-column: 1; grid-row: 1; justify-self: end; font-size: .75rem; }
+  .sim-controls .sim-draw { grid-column: 2; grid-row: 1; width: 160px; height: 44px; font-size: 1rem; }
+  .sim-controls .sim-summary { grid-column: 3; grid-row: 1; grid-template-columns: minmax(0, 1fr); justify-self: start; gap: 0; font-size: .7rem; }
+  .sim-dialog { max-height: 90dvh; padding: 12px; }
+  .sim-dialog .sim-hold { width: 130px; height: 130px; margin: 10px auto; }
+  .sim-dialog p { margin: 6px 0; }
+  .app-shell:has(#simulator-main) > footer { padding-block: 12px; }
+}

@@ -39,7 +39,7 @@ describe('S3 计算主页交互', () => {
     expect(screen.getByRole('main', { name: '规则说明' })).toBeTruthy()
     await user.click(card('性价比计算与解释'))
     expect(screen.getByText(/每100%概率等效卡片数仅用于比较当前单轮性价比/)).toBeTruthy()
-    await user.click(card('概率计算'))
+    await user.click(card('抽奖分析'))
     expect(card('六等奖').getAttribute('aria-pressed')).toBe('true')
     expect(screen.getByText('第2抽 / 共10抽')).toBeTruthy()
     expect(screen.queryByText(/每100%概率等效卡片数仅用于比较当前单轮性价比/)).toBeNull()
@@ -56,7 +56,7 @@ describe('S3 计算主页交互', () => {
     expect(within(row('二等奖')).getByText('1.497%')).toBeTruthy()
     expect(row('二等奖').textContent).toContain('668.000')
     expect(screen.getAllByRole('row')).toHaveLength(11)
-    expect(within(row('六等奖')).getAllByRole('cell').map(cell => cell.textContent)).toEqual(['—', '—', '—'])
+    expect(within(row('六等奖')).getAllByRole('cell').map(cell => cell.textContent)).toEqual(['—', '—'])
     await user.click(card('六等奖'))
     expect(card('六等奖').getAttribute('aria-pressed')).toBe('false')
     expect(screen.getByText('第2抽 / 共10抽')).toBeTruthy()
@@ -166,7 +166,7 @@ it('标记顺序连续、撤销重排且表格等级顺序不变；数值单元�
   expect(screen.getAllByRole('row').slice(1).map(r => within(r).getByRole('button').getAttribute('aria-label'))).toEqual(DEFAULT_CONFIGS.find(c => c.typeId === 'legendary_weapon')!.prizes.map(p => p.name))
   await user.click(within(row('一等奖')).getAllByRole('cell')[0])
   expect(card('一等奖').getAttribute('aria-pressed')).toBe('false')
-  expect(screen.getByRole('heading', { name: '抽奖计算' })).toBeTruthy()
+  expect(screen.queryByRole('heading', { name: '抽奖计算' })).toBeNull()
   expect(document.querySelector('.prize-grid')).toBeNull()
 })
 
@@ -175,25 +175,39 @@ it('指数列使用当前有效配置，已抽与终局为破折号，清空恢�
   const config = createDefaultConfig('legendary_weapon')
   const callbacks = { onToggle: () => {}, onClear: () => {} }
   const view = render(<CalculatorView config={config} drawnIds={[]} {...callbacks} />)
-  expect(screen.getAllByRole('columnheader').map(th => th.textContent)).toEqual(['奖品', '下一抽概率', '100%概率等效卡片数', '性价比指数'])
-  expect(screen.getAllByText('1.00×')).toHaveLength(10)
+  expect(screen.getAllByRole('columnheader').map(th => th.textContent)).toEqual(['奖品', '下一抽概率', '100%概率等效卡片数'])
+  expect(screen.getAllByText('1.00×')).toHaveLength(1)
   const ids = [config.prizes[5].prizeId, config.prizes[6].prizeId]
   view.rerender(<CalculatorView config={config} drawnIds={ids} {...callbacks} />)
-  expect(within(row('二等奖')).getAllByRole('cell')[2].textContent).toBe('0.36×')
-  expect(within(row('六等奖')).getAllByRole('cell')[2].textContent).toBe('—')
+  expect(screen.getByLabelText('性价比指数').textContent).toBe('0.36×')
+  expect(within(row('六等奖')).getAllByRole('cell').map(cell => cell.textContent)).toEqual(['—', '—'])
   config.roundCosts[0] = 6
   view.rerender(<CalculatorView config={config} drawnIds={ids} {...callbacks} />)
-  expect(within(row('二等奖')).getAllByRole('cell')[2].textContent).toBe('0.72×')
+  expect(screen.getByLabelText('性价比指数').textContent).toBe('0.72×')
   config.roundCosts[2] = 0
   view.rerender(<CalculatorView config={config} drawnIds={ids} {...callbacks} />)
-  expect(within(row('二等奖')).getAllByRole('cell')[2].textContent).toBe('—')
+  expect(screen.getByLabelText('性价比指数').textContent).toBe('—')
   view.rerender(<CalculatorView config={config} drawnIds={config.prizes.map(p => p.prizeId)} {...callbacks} />)
   expect(screen.queryByText(/×/)).toBeNull()
   view.unmount()
   render(<App />)
   await user.click(card('六等奖'))
   await user.click(card('清空已抽记录'))
-  expect(screen.getAllByText('1.00×')).toHaveLength(10)
+  expect(screen.getAllByText('1.00×')).toHaveLength(1)
   await user.selectOptions(screen.getByLabelText('转盘类型'), 'seven_draw')
-  expect(screen.getAllByText('1.00×')).toHaveLength(7)
+  expect(screen.getAllByText('1.00×')).toHaveLength(1)
+})
+
+
+it('统一指数按原始值切换心跳与颜色，含舍入边界与无效值', () => {
+  const config = createDefaultConfig('seven_draw')
+  const callbacks = { onToggle: () => {}, onClear: () => {} }
+  const drawnIds = [config.prizes[6].prizeId]
+  const view = render(<CalculatorView config={config} drawnIds={drawnIds} {...callbacks} />)
+  for (const [first, next, expected] of [[299, 2500, 'heartbeat'], [3, 25, 'heartbeat'], [301, 2500, 'low'], [599, 2500, 'low'], [6, 25, 'baseline'], [999, 2500, 'baseline'], [4, 10, 'high'], [12, 10, 'high'], [3001, 2500, 'shimmer'], [0, 10, null]] as const) {
+    config.roundCosts[0] = first
+    config.roundCosts[1] = next
+    view.rerender(<CalculatorView config={config} drawnIds={drawnIds} {...callbacks} />)
+    expect(screen.getByLabelText('性价比指数').getAttribute('data-tone')).toBe(expected)
+  }
 })

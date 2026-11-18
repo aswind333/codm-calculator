@@ -36,7 +36,7 @@ export default function App({ storage = browserStorage }: { storage?: StorageAda
     <a className="skip-link" href={page === 'calculator' ? '#main' : `#${page}-main`}>跳到主要内容</a>
     <header className="site-header"><div className="brand"><span className="brand-symbol" aria-hidden="true">C</span><div><strong>CODM 抽奖计算器</strong><small>概率 · 花费 · 性价比</small></div></div>
       <nav aria-label="页面导航">
-        <button disabled={simulationBusy} aria-current={page === 'calculator' ? 'page' : undefined} onClick={() => leaveSettings()}><NavIcon kind="calculator" />概率计算</button>
+        <button disabled={simulationBusy} aria-current={page === 'calculator' ? 'page' : undefined} onClick={() => leaveSettings()}><NavIcon kind="calculator" />抽奖分析</button>
         <button disabled={simulationBusy} aria-current={page === 'rules' ? 'page' : undefined} onClick={() => leaveSettings('rules')}><NavIcon kind="rules" />规则说明</button>
         <button disabled={simulationBusy} aria-current={page === 'simulator' ? 'page' : undefined} onClick={() => leaveSettings('simulator')}><NavIcon kind="wheel" />模拟抽奖</button>
         <button disabled={simulationBusy} aria-current={page === 'settings' ? 'page' : undefined} title="可自定义概率与价格" onClick={() => setPage('settings')}><span className="settings-gear" aria-hidden="true">⚙</span> 设置</button>

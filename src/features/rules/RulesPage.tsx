@@ -57,7 +57,7 @@ export function RulesPage() {
   return <main id="rules-main" className="rules-page" aria-label="规则说明">
     <RuleSection {...sectionProps('三步使用教程')}>
       <ol className="rules-steps">{[
-        ['选择转盘', '在概率计算页面的『转盘类型』下拉菜单中选择对应转盘。'],
+        ['选择转盘', '在抽奖分析页面的『转盘类型』下拉菜单中选择对应转盘。'],
         ['标记已抽奖品', '点击奖品名称所在单元格标记为已抽取，再次点击可撤销。允许按任意顺序标记，并记录标记顺序。'],
         ['查看计算结果', '系统根据当前奖池自动计算下一抽概率、每100%概率等效卡片数及相关费用。'],
       ].map(([title, body], i) => <li key={title}><span className="eyebrow">0{i + 1}</span><h3>{title}</h3><p>{body}</p></li>)}</ol>
@@ -74,6 +74,7 @@ export function RulesPage() {
       <p>本轮10张卡、目标概率5%：</p><p className="rules-formula">10 ÷ 0.05 = {formatAmount(calculateEquivalentCost(.05, { status: 'ok', value: 10 }), 'equivalent')}卡</p>
       <p className="info-note">每100%概率等效卡片数仅用于比较当前单轮性价比，不代表实际保底价格或真实期望总花费。</p>
       <h3>性价比指数</h3>
+      <p>固定权重、不放回抽取下，所有有效剩余奖品的性价比指数相同，因此在抽奖分析页的轮次旁统一显示。</p>
       <p>比较某奖品当前下一抽与它自身在当前有效配置下第一抽的性价比。第一抽基准不随奖品剔除而改变；保存新配置后重新计算。</p>
       <p className="rules-formula">性价比指数 = 第一抽等效花费 ÷ 当前下一抽等效花费<br />等效花费 = 单抽价格 ÷ 对应奖品中奖概率</p>
       <p className="rules-formula">性价比指数 =（当前中奖概率 ÷ 当前单抽价格）÷（初始中奖概率 ÷ 第一抽价格）</p>
