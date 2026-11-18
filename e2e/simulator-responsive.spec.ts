@@ -129,3 +129,44 @@ for (const viewport of [{ width: 375, height: 812 }, { width: 1280, height: 720 
   await expect(page.getByRole('button', { name: '获取使命卡片' })).toBeVisible()
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
 })
+
+test.describe('页面内横屏可视视口兼容', () => {
+  test.use({ hasTouch: true })
+  for (const visual of [true, false]) test(`可视视口差异与尺寸回退 ${visual}`, async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 })
+    await page.addInitScript(visual => {
+      const viewport = Object.assign(new EventTarget(), { width: 360, height: 650, offsetLeft: 8, offsetTop: 24 })
+      Object.defineProperty(window, 'visualViewport', { configurable: true, value: visual ? viewport : null })
+    }, visual)
+    await page.goto('./')
+    await page.getByRole('button', { name: '模拟抽奖', exact: true }).click()
+    const shell = page.locator('.app-shell')
+    const arena = await page.locator('.sim-arena').elementHandle()
+    const check = async (width: number, height: number, left: number, top: number) => {
+      const box = await shell.boundingBox()
+      expect(box!.x).toBeCloseTo(left, 0); expect(box!.y).toBeCloseTo(top, 0)
+      expect(box!.width).toBeCloseTo(width, 0); expect(box!.height).toBeCloseTo(height, 0)
+      expect(await shell.evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true)
+      await page.getByRole('button', { name: '获取使命卡片' }).click()
+      const dialog = await page.getByRole('dialog').boundingBox()
+      expect(dialog!.x).toBeGreaterThanOrEqual(left)
+      expect(dialog!.y).toBeGreaterThanOrEqual(top)
+      expect(dialog!.x + dialog!.width).toBeLessThanOrEqual(left + width + 1)
+      expect(dialog!.y + dialog!.height).toBeLessThanOrEqual(top + height + 1)
+      await page.getByRole('button', { name: '关闭', exact: true }).click()
+    }
+    await check(visual ? 360 : 390, visual ? 650 : 844, visual ? 8 : 0, visual ? 24 : 0)
+    if (visual) {
+      await page.evaluate(() => {
+        Object.assign(window.visualViewport!, { width: 350, height: 600, offsetLeft: 12, offsetTop: 40 })
+        window.visualViewport!.dispatchEvent(new Event('resize'))
+        window.visualViewport!.dispatchEvent(new Event('scroll'))
+      })
+      await check(350, 600, 12, 40)
+    }
+    expect(await arena!.evaluate(el => el === document.querySelector('.sim-arena'))).toBe(true)
+    await page.getByRole('button', { name: '抽奖分析', exact: true }).click()
+    expect(await shell.evaluate(el => el.style.getPropertyValue('--sim-view-width'))).toBe('')
+    expect(await shell.evaluate(el => getComputedStyle(el).position)).not.toBe('fixed')
+  })
+})

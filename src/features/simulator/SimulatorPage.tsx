@@ -8,9 +8,11 @@ import { claimCards, initialSimulation, resetPool, startDraw, MAX_BALANCE } from
 import type { Simulation, SimulationEvent } from './model'
 import { HoldToClaim } from './HoldToClaim'
 import { PrizeArena } from './PrizeArena'
+import { useSimulationViewport } from './useSimulationViewport'
 import './simulator.css'
 
 export function SimulatorPage({ configs, storage, active, onBusy, onEvent }: { configs: readonly ReadonlyDrawConfig[]; storage: StorageAdapter; active: boolean; onBusy: (busy: boolean) => void; onEvent?: (event: SimulationEvent) => void }) {
+  useSimulationViewport(active)
   const [state, setState] = useState<Simulation>(initialSimulation)
   const [error, setError] = useState('')
   const [invalid, setInvalid] = useState(false)
