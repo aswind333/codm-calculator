@@ -43,14 +43,6 @@ export function SimulatorPage({ configs, storage, active, onBusy, onEvent }: { c
     if (modal && active) dialog.current?.showModal()
     else if (dialog.current?.open) dialog.current.close()
   }, [modal, active])
-  // Only dismiss transient card acquisition on phone portrait; never reset the draw.
-  useEffect(() => {
-    if (typeof window.matchMedia !== 'function') return
-    const portrait = window.matchMedia('(hover: none) and (pointer: coarse) and (max-width: 600px) and (orientation: portrait)')
-    const dismiss = () => { if (portrait.matches) setModal(false) }
-    portrait.addEventListener('change', dismiss)
-    return () => portrait.removeEventListener('change', dismiss)
-  }, [])
   async function mutate(change: (s: Simulation) => Simulation): Promise<Simulation | null> {
     if (running.current) return null
     running.current = true; setProcessing(true); setError('')
@@ -92,11 +84,6 @@ export function SimulatorPage({ configs, storage, active, onBusy, onEvent }: { c
   }
   if (!active) return null
   return <main id="simulator-main" className="sim-page" aria-label="模拟抽奖">
-    <section className="sim-rotate panel" aria-label="横屏提示">
-      <svg viewBox="0 0 64 64" aria-hidden="true"><rect x="22" y="12" width="22" height="38" rx="4" /><path d="M12 33a22 22 0 0 1 34-18M46 7v8h-8M52 31a22 22 0 0 1-34 18M18 57v-8h8" /></svg>
-      <h2>请横屏体验模拟抽奖</h2>
-      <p>将手机旋转至横屏，即可体验完整转盘。</p>
-    </section>
     <div className="sim-experience">
     {invalid && <button onClick={async () => {
       if (!window.confirm('仅清除模拟余额和模拟奖池记录？此操作不可撤销，不影响计算器设置。')) return

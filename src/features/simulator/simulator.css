@@ -91,17 +91,8 @@
 @media (max-width: 600px) { .sim-summary { grid-template-columns: minmax(0, 1fr); } }
 
 
-/* Keep one mounted arena; device capability prevents narrow desktop false positives. */
-.sim-rotate { display: none; }
-@media (hover: none) and (pointer: coarse) and (max-width: 600px) and (orientation: portrait) {
-  .sim-experience { display: none; }
-  .sim-experience .sim-dialog { display: none; }
-  .sim-rotate { display: grid; justify-items: center; gap: 12px; margin-top: 14px; padding: 32px 18px; text-align: center; }
-  .sim-rotate svg { width: 64px; height: 64px; fill: none; stroke: var(--primary); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
-  .sim-rotate h2 { font-size: 1.1rem; }
-  .sim-rotate p { font-size: .85rem; color: var(--muted); }
-}
-@media (hover: none) and (pointer: coarse) and (orientation: landscape) and (max-height: 500px) and (max-width: 1000px) {
+@media (hover: none) and (pointer: coarse) and (orientation: landscape) and (max-height: 500px) and (max-width: 1000px),
+  (hover: none) and (pointer: coarse) and (orientation: portrait) and (max-width: 600px) {
   /* Only the active simulator may compact the shared shell. Other pages are unchanged. */
   .app-shell:has(#simulator-main) { padding-inline: max(12px, env(safe-area-inset-left)) max(12px, env(safe-area-inset-right)); }
   .app-shell:has(#simulator-main) .site-header { padding-block: 4px; gap: 8px; flex-wrap: nowrap; }
@@ -142,4 +133,21 @@
   .sim-dialog .sim-hold { width: 130px; height: 130px; margin: 10px auto; }
   .sim-dialog p { margin: 6px 0; }
   .app-shell:has(#simulator-main) > footer { padding-block: 12px; }
+}
+
+/* A locked portrait browser gets a landscape canvas without remounting the simulator. */
+@media (hover: none) and (pointer: coarse) and (orientation: portrait) and (max-width: 600px) {
+  .app-shell:has(#simulator-main) {
+    position: fixed; top: 0; left: 100dvw;
+    width: 100dvh; max-width: none; height: 100dvw;
+    margin: 0; overflow: auto; overscroll-behavior: contain;
+    transform: rotate(90deg); transform-origin: top left;
+    background: var(--page);
+    padding-inline: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-bottom));
+  }
+  .app-shell:has(#simulator-main) .brand-symbol { width: 36px; height: 36px; font-size: 1.3rem; }
+  .app-shell:has(#simulator-main) .brand strong { font-size: .85rem; }
+  .sim-character svg { max-height: clamp(100px, 38dvw, 160px); }
+  /* Native dialogs enter the top layer, so rotate them separately around their centre. */
+  .sim-dialog { width: min(420px, calc(100dvh - 24px)); max-width: none; max-height: calc(100dvw - 24px); position: fixed; inset: auto; left: 50%; top: 50%; margin: 0; transform: translate(-50%, -50%) rotate(90deg); }
 }
